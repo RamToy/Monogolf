@@ -2,6 +2,7 @@ import pygame
 from settings import *
 from slingshot import Slingshot
 from ball import ball, Ball
+from sprites import rects
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -26,6 +27,7 @@ while running:
 
     screen.fill(bg_color)      # Заливка поля
     slingshot.render(screen)   # Прорисовка рогатки
+    rects.draw(screen)         # Прорисовка группы прямоугольников
     ball.draw(screen)          # Прорисовка мячика
 
     pygame.display.flip()

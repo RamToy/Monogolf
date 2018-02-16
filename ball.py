@@ -1,6 +1,7 @@
 import pygame
 from settings import bg_color, fg_color
 from math import hypot, sin, cos, atan, pi, sqrt
+from sprites import rects
 
 # Группа одного спрайта с мячиком
 ball = pygame.sprite.GroupSingle()
@@ -38,7 +39,7 @@ class Ball(pygame.sprite.Sprite):
         self.y_dir = 0            # Направление по оси Y
         self.x_step = 0           # Шаг по оси X
         self.y_step = 0           # Шаг по оси Y
-        self.alpha = 0            # Угол между вектором движения и осью X
+        self.agle = 0            # Угол между вектором движения и осью X
         self.calculated = False   # Флаг, отвечающий за порядок вычислений
 
     ''' Метод, вычисляющий параметры движения мячика '''
@@ -50,9 +51,12 @@ class Ball(pygame.sprite.Sprite):
 
         # Вычисление угла
         try:
-            self.alpha = atan(abs(y_proj / x_proj))
+            self.agle = atan(abs(y_proj / x_proj))
         except ZeroDivisionError:
-            self.alpha = pi / 2
+            self.agle = pi / 2
+
+        # Вычисление скорости
+        self.speed = hypot(x_proj, y_proj) // self.one_step
 
         # Направление движения по оси X
         self.x_dir = 1 if x_proj > 0 else (-1 if x_proj < 0 else 0)
@@ -60,9 +64,9 @@ class Ball(pygame.sprite.Sprite):
         self.y_dir = 1 if y_proj > 0 else (-1 if y_proj < 0 else 0)
 
         # Шаг по оси X
-        self.x_step = round(cos(self.alpha) * self.one_step)
+        self.x_step = round(cos(self.agle) * self.one_step)
         # Шаг по оси Y
-        self.y_step = round(sin(self.alpha) * self.one_step)
+        self.y_step = round(sin(self.agle) * self.one_step)
 
     ''' Метод, обновляюший состояние или положение мячика '''
     def update(self):
@@ -82,3 +86,23 @@ class Ball(pygame.sprite.Sprite):
             else:
                 self.calculate(self.slingshot.center_pos, self.slingshot.cur_pos)
                 self.calculated = True
+
+        # Пересечение мячика с группой прямоугольников
+        rect_collide = pygame.sprite.spritecollideany(self, rects)
+
+        # Если мячик пересекается с прямоугольником
+        if rect_collide:
+            # Сторона, с которой пересекается мячик
+            value = side_collide(self.rect.center, rect_collide.rect)
+            if value == 'left':
+                self.x_dir = -1
+            elif value == 'right':
+                self.x_dir = 1
+            elif value == 'top':
+                self.y_dir = -1
+            elif value == 'bottom':
+                self.y_dir = 1
+            '''Небольшое пояснение: я не стал делать так, что, например, при столкновении с горизонтальными 
+               сторонами направление по оси Y меняется на противоположное [self.y_dir = -self.y_dir], т.к.
+               при таком раскладе у меня возникал баг, когда при попадании в угол рамки мяч застревал там
+               и начинал мандражировать, бегая по всей рамке в одну сторону.'''

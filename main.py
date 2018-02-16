@@ -2,7 +2,7 @@ import pygame
 from settings import *
 from slingshot import Slingshot
 from ball import ball, Ball
-from sprites import rects
+from sprites import rects, polygons
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -22,13 +22,23 @@ while running:
         # Передача событий рогатке
         slingshot.get_event(event)
 
-    # Обновление положения мячика
-    ball.update()
+    ball.update()         # <<<===
 
     screen.fill(bg_color)      # Заливка поля
     slingshot.render(screen)   # Прорисовка рогатки
     rects.draw(screen)         # Прорисовка группы прямоугольников
+    polygons.draw(screen)      # Прорисовка группы полигонов
     ball.draw(screen)          # Прорисовка мячика
+
+    # Позволяет увидеть сторону полигона, с которой пересекается мячик
+    # Необходимо закомментировать строку  >>> ball.update()
+    # Есть некоторые примечания ==>> см. класс Ball
+    #
+    # for b in ball:
+    #     calc = b.update()
+    #     if calc:
+    #         line = calc
+    #         pygame.draw.line(screen, (0, 0, 255), *line, 3)
 
     pygame.display.flip()
     clock.tick(60)

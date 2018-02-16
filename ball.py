@@ -1,7 +1,7 @@
 import pygame
 from settings import bg_color, fg_color
 from math import hypot, sin, cos, atan, pi, sqrt
-from sprites import rects
+from sprites import rects, polygons
 
 # Группа одного спрайта с мячиком
 ball = pygame.sprite.GroupSingle()
@@ -16,6 +16,26 @@ def side_collide(pos, rect):
     # Вычисляет расстояние до каждой из сторон и возвращает минимальное
     min_value = min(range_dict.items(), key=lambda x: x[1])
     return min_value[0]
+
+
+''' Функция, определяющая пересечение окружности с линией.
+    Примечание заключается в том, что я нашел это в интернете и толком не разбирался.
+    Покрутив эту штуку, я увидел, что функция определяет именно пересечения прямой 
+    (а не отрезка) с окружностью, поэтому с невыпуклыми многоугольниками лучше не связываться.
+    Но, т.к. планируются использоваться только треугольники и ромбы, этого вполне хватит.'''
+def circle_and_line_intersection(r, circle_pos, point1, point2):
+    x1, y1 = point1
+    x2, y2 = point2
+    cx, cy = circle_pos
+    
+    a = (x2 - x1)**2 + (y2 - y1)**2
+    b = 2 * ((x2 - x1) * (x1 - cx) + (y2 - y1) * (y1 - cy))
+    c = cx**2 + cy**2 + x1**2 + y1**2 - 2 * (cx * x1 + cy * y1) - r**2
+    i = b**2 - 4 * a * c
+
+    if i >= 0.0:
+        return True
+    return False
 
 
 ''' Класс мячика '''
@@ -39,11 +59,11 @@ class Ball(pygame.sprite.Sprite):
         self.y_dir = 0            # Направление по оси Y
         self.x_step = 0           # Шаг по оси X
         self.y_step = 0           # Шаг по оси Y
-        self.agle = 0            # Угол между вектором движения и осью X
+        self.alpha = 0            # Угол между вектором движения и осью X
         self.calculated = False   # Флаг, отвечающий за порядок вычислений
 
     ''' Метод, вычисляющий параметры движения мячика '''
-    def calculate(self, start_pos, end_pos):
+    def calculate(self, start_pos, end_pos, reflection=False):
         # Проекция вектора перемещения ось на X
         x_proj = start_pos[0] - end_pos[0]
         # Проекция вектора перемещения ось на Y
@@ -51,12 +71,22 @@ class Ball(pygame.sprite.Sprite):
 
         # Вычисление угла
         try:
-            self.agle = atan(abs(y_proj / x_proj))
+            agle = atan(abs(y_proj / x_proj))
         except ZeroDivisionError:
-            self.agle = pi / 2
+            agle = pi / 2
 
-        # Вычисление скорости
-        self.speed = hypot(x_proj, y_proj) // self.one_step
+        # Флаг reflection со значением True должен передавться, когда происходит отражение
+        # мячика от стороны многоугольника, то есть в силу вступает второй угол между
+        # этой стороной и осью X
+        if reflection:
+            # Эту формулу я вывел сам, но работает не очень исправно
+            # (В данном случае agle - угол между стороной и осью X)
+            self.alpha = 2 * agle - self.alpha
+        else:
+            # (В данном случае agle - основной угол движения мячика)
+            self.alpha = agle
+            # Также здесь в первый раз вычисляется скорость
+            self.speed = hypot(x_proj, y_proj) // self.one_step
 
         # Направление движения по оси X
         self.x_dir = 1 if x_proj > 0 else (-1 if x_proj < 0 else 0)
@@ -64,9 +94,9 @@ class Ball(pygame.sprite.Sprite):
         self.y_dir = 1 if y_proj > 0 else (-1 if y_proj < 0 else 0)
 
         # Шаг по оси X
-        self.x_step = round(cos(self.agle) * self.one_step)
+        self.x_step = round(cos(self.alpha) * self.one_step)
         # Шаг по оси Y
-        self.y_step = round(sin(self.agle) * self.one_step)
+        self.y_step = round(sin(self.alpha) * self.one_step)
 
     ''' Метод, обновляюший состояние или положение мячика '''
     def update(self):
@@ -84,11 +114,13 @@ class Ball(pygame.sprite.Sprite):
                 self.rect.move_ip(self.x_step * self.x_dir, self.y_step * self.y_dir)
             # Если нет, то происходит подсчет
             else:
-                self.calculate(self.slingshot.center_pos, self.slingshot.cur_pos)
+                self.calculate(self.slingshot.center_pos, self.slingshot.cur_pos, False)
                 self.calculated = True
 
         # Пересечение мячика с группой прямоугольников
         rect_collide = pygame.sprite.spritecollideany(self, rects)
+        # Пересечение мячика с группой многоугольников
+        polygon_collide = pygame.sprite.spritecollideany(self, polygons)
 
         # Если мячик пересекается с прямоугольником
         if rect_collide:
@@ -106,3 +138,15 @@ class Ball(pygame.sprite.Sprite):
                сторонами направление по оси Y меняется на противоположное [self.y_dir = -self.y_dir], т.к.
                при таком раскладе у меня возникал баг, когда при попадании в угол рамки мяч застревал там
                и начинал мандражировать, бегая по всей рамке в одну сторону.'''
+
+        # Если мячик пересекается с моногоугольником
+        if polygon_collide:
+            # В цикле проверяются пересечения сторон многоугольника с окружностью шарика
+            for line in polygon_collide.lines:
+                if circle_and_line_intersection(self.radius, self.rect.center, *line):
+                    # Вычисляются новые параметры шарика
+                    self.calculate(*line, reflection=True)   # Происходит отражение, поэтому reflection=True
+                    # Эта строчка нужна только для того, чтобы передать координаты
+                    # стороны в главный цикл, затем нарисовать ее ==>> см. main.py
+                    #
+                    # return line

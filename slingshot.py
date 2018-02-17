@@ -1,7 +1,8 @@
 import pygame
-from settings import HEIGHT, INDENT, fg_color
+from monogolf.settings import HEIGHT, INDENT, fg_color
 
 ''' Класс рогатки '''
+
 class Slingshot:
     def __init__(self, center_pos, center_range, shoulder_radius):
         # Дефолтная позиция

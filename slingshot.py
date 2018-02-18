@@ -1,9 +1,10 @@
 import pygame
-from monogolf.settings import HEIGHT, INDENT, fg_color
+from Monogolf.settings import HEIGHT, INDENT, fg_color
 
-''' Класс рогатки '''
 
 class Slingshot:
+    """ Класс рогатки """
+
     def __init__(self, center_pos, center_range, shoulder_radius):
         # Дефолтная позиция
         self.center_pos = center_pos
@@ -32,8 +33,9 @@ class Slingshot:
         # Флаг, отвечающий за фокусировку (перемещение за курсором) рогатки
         self.focus = False
 
-    ''' Метод, проверяющий выход рогатки при натягивании за пределы активной зоны (self.active_rect) '''
     def check_pos(self, pos):
+        """ Метод, проверяющий выход рогатки при натягивании за пределы активной зоны (self.active_rect) """
+
         x, y = pos
         if x < self.active_rect.left:
             x = self.active_rect.left
@@ -45,8 +47,9 @@ class Slingshot:
             y = self.active_rect.bottom
         return x, y
 
-    ''' Метод, отрисовывающий рогатку '''
     def render(self, surface):
+        """ Метод, отрисовывающий рогатку """
+
         # Если рогатка активна, то она рисуется
         if self.active:
             # Здесь можно посмотреть зоны активности и захвата
@@ -57,8 +60,9 @@ class Slingshot:
             pygame.draw.circle(surface, fg_color, self.left_shoulder, self.shoulder_radius, 0)
             pygame.draw.circle(surface, fg_color, self.right_shoulder, self.shoulder_radius, 0)
 
-    ''' Метод, отвечающий за обработку событий '''
     def get_event(self, event):
+        """ Метод, отвечающий за обработку событий """
+
         # Если рогатка активна
         if self.active:
             # Если зажата ЛКМ в области захвата

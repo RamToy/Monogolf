@@ -1,15 +1,15 @@
 import pygame
-from monogolf.settings import *
+from Monogolf.settings import *
 
 # Группа спрайтов с прямоугольниками
 rects = pygame.sprite.Group()
 # Группа одного спрайта с лункой
 hole = pygame.sprite.GroupSingle()
 
-''' Класс спрайта прямоугольника '''
-
 
 class BoarderRect(pygame.sprite.Sprite):
+    """ Класс спрайта прямоугольника """
+
     def __init__(self, x, y, width, height):
         self.rect = pygame.Rect(x, y, width, height)
         super().__init__(rects)
@@ -17,10 +17,9 @@ class BoarderRect(pygame.sprite.Sprite):
         self.image.fill(fg_color)
 
 
-''' Класс спрайта лунки '''
-
-
 class Hole(pygame.sprite.Sprite):
+    """ Класс спрайта лунки """
+
     def __init__(self, pos, radius, color):
         super().__init__(hole)
         self.pos = pos
@@ -29,14 +28,3 @@ class Hole(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.pos[0] - radius // 2, self.pos[1] - radius // 2, radius, radius)
         self.image = pygame.Surface((2 * radius, 2 * radius),  pygame.SRCALPHA, 32)
         pygame.draw.circle(self.image, color, (radius, radius), radius, 0)
-
-
-# Рамки
-BoarderRect(0, 0, WIDTH - INDENT, INDENT)
-BoarderRect(0, INDENT, INDENT, HEIGHT - INDENT)
-BoarderRect(INDENT, HEIGHT - INDENT, WIDTH - INDENT, INDENT)
-BoarderRect(WIDTH - INDENT, 0, INDENT, HEIGHT - INDENT)
-
-
-
-

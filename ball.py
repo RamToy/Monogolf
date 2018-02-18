@@ -1,29 +1,26 @@
 import pygame
 from math import hypot, sin, cos, atan, pi
-from monogolf.settings import bg_color, fg_color
-from monogolf.sprites import rects, hole
+from Monogolf.sprites import rects, hole
 
 # Группа одного спрайта с мячиком
 ball = pygame.sprite.GroupSingle()
 
 
-''' Функция, вычисляющая сторону прямоугольника, с которой произошло пересечение '''
-
-
 def side_collide(pos, rect):
-    range_dict = {'left': pos[0] - rect.left,
-                  'right': rect.right - pos[0],
-                  'top': pos[1] - rect.top,
-                  'bottom': rect.bottom - pos[1]}
+    """ Функция, вычисляющая сторону прямоугольника, с которой произошло пересечение """
+
+    range_dict = {"left": pos[0] - rect.left,
+                  "right": rect.right - pos[0],
+                  "top": pos[1] - rect.top,
+                  "bottom": rect.bottom - pos[1]}
     # Вычисляет расстояние до каждой из сторон и возвращает минимальное
     min_value = min(range_dict.items(), key=lambda x: x[1])
     return min_value[0]
 
 
-''' Класс мячика '''
-
-
 class Ball(pygame.sprite.Sprite):
+    """ Класс мячика """
+
     def __init__(self, slingshot, radius, color):
         # Необходимо передавать объект рогатки и сверяться с его состоянием,
         # чтобы перемещать мячик вместе с ней во время натяжки
@@ -36,18 +33,20 @@ class Ball(pygame.sprite.Sprite):
         pygame.draw.circle(self.image, self.color, (radius, radius), radius, 0)
         self.rect = self.image.get_rect()
 
-        '''Изначально до движения мячика все параметры равны нулю'''
+        # Изначально до движения мячика все параметры равны нулю
         self.one_step = 15        # Длина единичного вектора
         self.speed = 0            # Скорость перемещения для tick()
         self.x_dir = 0            # Направление по оси X
         self.y_dir = 0            # Направление по оси Y
         self.x_step = 0           # Шаг по оси X
         self.y_step = 0           # Шаг по оси Y
-        self.agle = 0             # Угол между вектором движения и осью X
+        self.angle = 0            # Угол между вектором движения и осью X
         self.calculated = False   # Флаг, отвечающий за порядок вычислений
+        self.hitting = False      # Флаг, отвечающий за попадпние в лунку
 
-    ''' Метод, вычисляющий параметры движения мячика '''
     def calculate(self, start_pos, end_pos):
+        """ Метод, вычисляющий параметры движения мячика """
+
         # Проекция вектора перемещения ось на X
         x_proj = start_pos[0] - end_pos[0]
         # Проекция вектора перемещения ось на Y
@@ -55,13 +54,11 @@ class Ball(pygame.sprite.Sprite):
 
         # Вычисление угла
         try:
-            alpha = atan(abs(y_proj / x_proj))
+            self.angle = atan(abs(y_proj / x_proj))
         except ZeroDivisionError:
-            alpha = pi / 2
+            self.angle = pi / 2
 
-        # (В данном случае alpha - основной угол движения мячика)
-        self.agle = alpha
-        # Также здесь в первый раз вычисляется скорость
+        # Вычисление скорости
         self.speed = hypot(x_proj, y_proj) // self.one_step
 
         # Направление движения по оси X
@@ -70,12 +67,13 @@ class Ball(pygame.sprite.Sprite):
         self.y_dir = 1 if y_proj > 0 else (-1 if y_proj < 0 else 0)
 
         # Шаг по оси X
-        self.x_step = round(cos(self.agle) * self.one_step)
+        self.x_step = round(cos(self.angle) * self.one_step)
         # Шаг по оси Y
-        self.y_step = round(sin(self.agle) * self.one_step)
+        self.y_step = round(sin(self.angle) * self.one_step)
 
-    ''' Метод, обновляюший состояние или положение мячика '''
     def update(self):
+        """ Метод, обновляюший состояние или положение мячика """
+
         # Если рогатка активна, то мячик перемещается вместе с ней
         if self.slingshot.active:
             self.rect.center = self.slingshot.cur_pos
@@ -95,26 +93,22 @@ class Ball(pygame.sprite.Sprite):
 
         # Пересечение мячика с группой прямоугольников
         rect_collide = pygame.sprite.spritecollideany(self, rects)
-        # Пересечение мячика с группой лунки
-        # hole_collide = pygame.sprite.spritecollideany(self, hole)
 
         # Если мячик пересекается с прямоугольником
         if rect_collide:
             # Сторона, с которой пересекается мячик
             value = side_collide(self.rect.center, rect_collide.rect)
-            if value == 'left':
+            if value == "left":
                 self.x_dir = -1
-            elif value == 'right':
+            elif value == "right":
                 self.x_dir = 1
-            elif value == 'top':
+            elif value == "top":
                 self.y_dir = -1
-            elif value == 'bottom':
+            elif value == "bottom":
                 self.y_dir = 1
-            '''Небольшое пояснение: я не стал делать так, что, например, при столкновении с горизонтальными 
+            """Небольшое пояснение: я не стал делать так, что, например, при столкновении с горизонтальными 
                сторонами направление по оси Y меняется на противоположное [self.y_dir = -self.y_dir], т.к.
                при таком раскладе у меня возникал баг, когда при попадании в угол рамки мяч застревал там
-               и начинал мандражировать, бегая по всей рамке в одну сторону.'''
+               и начинал мандражировать, бегая по всей рамке в одну сторону."""
 
-        if pygame.sprite.collide_circle(self, hole.sprite):
-            print(1)
-
+        self.hitting = pygame.sprite.collide_circle(self, hole.sprite)

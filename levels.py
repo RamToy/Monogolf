@@ -27,14 +27,14 @@ def level_2():
 
 def level_3():
     add_frames()
-    BoarderRect(20, 400, 750, 30)
+    BoarderRect(20, 400, 720, 30)
     BoarderRect(160, 300, 720, 30)
     BoarderRect(20, 300, 30, 30)
     BoarderRect(20, 200, 520, 30)
     BoarderRect(650, 200, 230, 30)
     BoarderRect(180, 100, 700, 30)
     BoarderRect(20, 100, 50, 30)
-    BoarderRect(740, 430, 30, 80)
+    BoarderRect(740, 400, 30, 110)
     Hole((810, 30), 30, ball_color)
 
 
@@ -51,11 +51,11 @@ def level_5():
     add_frames()
     BoarderRect(80, 540, 80, 80)
     BoarderRect(220, 500, 40, 180)
-    BoarderRect(220, 400, 280, 40)
+    BoarderRect(220, 400, 240, 40)
     BoarderRect(20, 300, 140, 40)
     BoarderRect(220, 150, 190, 190)
     BoarderRect(220, 50, 190, 40)
-    BoarderRect(460, 170, 40, 230)
+    BoarderRect(460, 170, 40, 270)
     Hole((70, 200), 30, ball_color)
 
 

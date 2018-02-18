@@ -10,14 +10,23 @@ from Monogolf.levels import *
 
 
 page_bgcolor = 43, 173, 100
-page_text_color = 251, 254, 255
+base_text_color = 251, 254, 255
+special_color = 166, 34, 146
 unlocked_widget = 250, 100, 0
 locked_widget = 140, 140, 140
-phrases = ['GG!', 'GJ!', 'WP!']
 
+phrases = ['GG!', 'GJ!', 'WP!']
 all_levels = [[level_1, True], [level_2, False], [level_3, False], [level_4, False], [level_5, False],
               [level_6, False], [level_7, False], [level_8, False], [level_9, False], [level_10, False]]
 current_level = 0
+
+images = []
+for i in range(len(colors)):
+    bg, fg, b = colors[i]
+    image = pygame.Surface((110, 60))
+    image.fill(bg)
+    pygame.draw.circle(image, b, (55, 30), 15, 0)
+    images.append([image, True if i == 0 else False])
 
 
 def terminate():
@@ -29,11 +38,11 @@ def menu_page(surface):
     gui_menu = GUI()
 
     gui_menu.add_element(Label((270, 30, 150, 100), -1, "mono", (0, 0, 0)))
-    gui_menu.add_element(Label((450, 30, 100, 100), -1, "GOLF", page_text_color))
-    play_button = Button((330, 170, 230, 80), unlocked_widget, " Играть", page_text_color)
-    shop_button = Button((330, 330, 230, 80), unlocked_widget, "Магазин", page_text_color)
-    exit_button = Button((330, 490, 230, 80), unlocked_widget, " Выход", page_text_color)
-    developers = Button((365, 620, 165, 30), unlocked_widget, " 2018   SilverToy58", page_text_color)
+    gui_menu.add_element(Label((450, 30, 100, 100), -1, "GOLF", base_text_color))
+    play_button = Button((330, 170, 230, 80), unlocked_widget, " Играть", base_text_color)
+    shop_button = Button((330, 330, 230, 80), unlocked_widget, "Магазин", base_text_color)
+    exit_button = Button((330, 490, 230, 80), unlocked_widget, " Выход", base_text_color)
+    developers = Button((365, 620, 165, 30), unlocked_widget, " 2018   SilverToy58", base_text_color)
 
     gui_menu.add_element(play_button)
     gui_menu.add_element(shop_button)
@@ -53,7 +62,7 @@ def menu_page(surface):
         if play_button.pressed:
             levels_page(surface)
         elif shop_button.pressed:
-            shop_page(surface)
+            store_page(surface)
         elif developers.pressed:
             developers_page(surface)
         elif exit_button.pressed:
@@ -65,26 +74,26 @@ def levels_page(surface):
 
     gui_levels = GUI()
     lvl1 = Button((175, 30, 250, 72), unlocked_widget if all_levels[0][1] else locked_widget,
-                  " Level 1", page_text_color)
+                  " Level 1", base_text_color)
     lvl2 = Button((475, 30, 250, 72), unlocked_widget if all_levels[1][1] else locked_widget,
-                  " Level 2", page_text_color)
+                  " Level 2", base_text_color)
     lvl3 = Button((175, 150, 250, 72), unlocked_widget if all_levels[2][1] else locked_widget,
-                  " Level 3", page_text_color)
+                  " Level 3", base_text_color)
     lvl4 = Button((475, 150, 250, 72), unlocked_widget if all_levels[3][1] else locked_widget,
-                  " Level 4", page_text_color)
+                  " Level 4", base_text_color)
     lvl5 = Button((175, 270, 250, 72), unlocked_widget if all_levels[4][1] else locked_widget,
-                  " Level 5", page_text_color)
+                  " Level 5", base_text_color)
     lvl6 = Button((475, 270, 250, 72), unlocked_widget if all_levels[5][1] else locked_widget,
-                  " Level 6", page_text_color)
+                  " Level 6", base_text_color)
     lvl7 = Button((175, 390, 250, 72), unlocked_widget if all_levels[6][1] else locked_widget,
-                  " Level 7", page_text_color)
+                  " Level 7", base_text_color)
     lvl8 = Button((475, 390, 250, 72), unlocked_widget if all_levels[7][1] else locked_widget,
-                  " Level 8", page_text_color)
+                  " Level 8", base_text_color)
     lvl9 = Button((175, 510, 250, 72), unlocked_widget if all_levels[8][1] else locked_widget,
-                  " Level 9", page_text_color)
+                  " Level 9", base_text_color)
     lvl10 = Button((475, 510, 250, 72), unlocked_widget if all_levels[9][1] else locked_widget,
-                   " Level 10", page_text_color)
-    back = Button((375, 640, 150, 40), unlocked_widget, "     назад", page_text_color)
+                   " Level 10", base_text_color)
+    back = Button((365, 620, 170, 60), unlocked_widget, "  назад", base_text_color)
 
     gui_levels.add_element(lvl1)
     gui_levels.add_element(lvl2)
@@ -142,40 +151,41 @@ def levels_page(surface):
             game_page(surface, level_10)
 
 
-def shop_page(surface):
+def store_page(surface):
     gui_shop = GUI()
-    design_bg1 = Button((175, 20, 140, 60), unlocked_widget, " фон1", page_text_color)
-    design_bg2 = Button((20, 120, 140, 60), unlocked_widget, " фон2", page_text_color)
-    design_bg3 = Button((20, 220, 140, 60), unlocked_widget, " фон3", page_text_color)
-    design_bg4 = Button((20, 320, 140, 60), unlocked_widget, " фон4", page_text_color)
-    design_bg5 = Button((20, 420, 140, 60), unlocked_widget, " фон5", page_text_color)
-    design_bg6 = Button((175, 20, 140, 60), unlocked_widget, " фон6", page_text_color)
-    design_bg7 = Button((180, 120, 140, 60), unlocked_widget, " фон7", page_text_color)
-    design_bg8 = Button((180, 220, 140, 60), unlocked_widget, " фон8", page_text_color)
-    design_bg9 = Button((180, 320, 140, 60), unlocked_widget, " фон9", page_text_color)
-    design_bg10 = Button((180, 420, 140, 60), unlocked_widget, "фон10", page_text_color)
-    design_bg11 = Button((340, 20, 140, 60), unlocked_widget, "фон11", page_text_color)
-    design_bg12 = Button((340, 120, 140, 60), unlocked_widget, "фон12", page_text_color)
-    design_bg13 = Button((340, 220, 140, 60), unlocked_widget, "фон13", page_text_color)
-    design_bg14 = Button((340, 320, 140, 60), unlocked_widget, "фон14", page_text_color)
-    design_bg15 = Button((340, 420, 140, 60), unlocked_widget, "фон15", page_text_color)
-    back = Button((300, 640, 150, 40), unlocked_widget, "     назад", page_text_color)
+    gui_shop.add_element(Label((300, 20, 310, 100), special_color, " Магазин", base_text_color))
+    design1 = Button((75, 150, 150, 100), colors[0][1] if images[0][1] else locked_widget,
+                     image=images[0][0] if images[0][1] else None)
+    design2 = Button((275, 150, 150, 100), colors[1][1] if images[1][1] else locked_widget,
+                     image=images[1][0] if images[1][1] else None)
+    design3 = Button((475, 150, 150, 100), colors[2][1] if images[2][1] else locked_widget,
+                     image=images[2][0] if images[2][1] else None)
+    design4 = Button((675, 150, 150, 100), colors[3][1] if images[3][1] else locked_widget,
+                     image=images[3][0] if images[3][1] else None)
+    design5 = Button((75, 300, 150, 100), colors[4][1] if images[4][1] else locked_widget,
+                     image=images[4][0] if images[4][1] else None)
+    design6 = Button((275, 300, 150, 100), colors[5][1] if images[5][1] else locked_widget,
+                     image=images[5][0] if images[5][1] else None)
+    design7 = Button((475, 300, 150, 100), colors[6][1] if images[6][1] else locked_widget,
+                     image=images[6][0] if images[6][1] else None)
+    design8 = Button((675, 300, 150, 100), colors[7][1] if images[7][1] else locked_widget,
+                     image=images[7][0] if images[7][1] else None)
+    design9 = Button((75, 450, 150, 100), colors[8][1] if images[8][1] else locked_widget,
+                     image=images[8][0] if images[8][1] else None)
+    design10 = Button((275, 450, 150, 100), colors[9][1] if images[9][1] else locked_widget,
+                      image=images[9][0] if images[9][1] else None)
+    back = Button((75, 610, 170, 60), unlocked_widget, "  назад", base_text_color)
 
-    gui_shop.add_element(design_bg1)
-    gui_shop.add_element(design_bg2)
-    gui_shop.add_element(design_bg3)
-    gui_shop.add_element(design_bg4)
-    gui_shop.add_element(design_bg5)
-    gui_shop.add_element(design_bg6)
-    gui_shop.add_element(design_bg7)
-    gui_shop.add_element(design_bg8)
-    gui_shop.add_element(design_bg9)
-    gui_shop.add_element(design_bg10)
-    gui_shop.add_element(design_bg11)
-    gui_shop.add_element(design_bg12)
-    gui_shop.add_element(design_bg13)
-    gui_shop.add_element(design_bg14)
-    gui_shop.add_element(design_bg15)
+    gui_shop.add_element(design1)
+    gui_shop.add_element(design2)
+    gui_shop.add_element(design3)
+    gui_shop.add_element(design4)
+    gui_shop.add_element(design5)
+    gui_shop.add_element(design6)
+    gui_shop.add_element(design7)
+    gui_shop.add_element(design8)
+    gui_shop.add_element(design9)
+    gui_shop.add_element(design10)
     gui_shop.add_element(back)
 
     surface.fill(page_bgcolor)
@@ -194,9 +204,9 @@ def shop_page(surface):
 
 def developers_page(surface):
     gui_dev = GUI()
-    gui_dev.add_element(Label((70, 70, 250, 50), -1, "Эта ссылка временно не работает...", page_text_color))
-    gui_dev.add_element(Label((70, 100, 250, 50), -1, '"назад", чтобы выйти в главное меню', page_text_color))
-    back = Button((300, 640, 150, 40), unlocked_widget, "     назад", page_text_color)
+    gui_dev.add_element(Label((70, 70, 250, 50), -1, "Эта ссылка временно не работает...", special_color))
+    gui_dev.add_element(Label((70, 100, 250, 50), -1, '"назад", чтобы выйти в главное меню', special_color))
+    back = Button((300, 640, 150, 40), unlocked_widget, "     назад", base_text_color)
     gui_dev.add_element(back)
 
     surface.fill(page_bgcolor)
@@ -219,10 +229,10 @@ def page_between_levels(surface):
     all_levels[current_level][1] = True
 
     gui_lvl = GUI()
-    gui_lvl.add_element(Label((150, 50, 620, 100), unlocked_widget, " Уровень пройден", page_text_color))
-    gui_lvl.add_element(Label((220, 150, 400, 400), -1, random.choice(phrases), (166, 34, 146)))
-    go_to_menu = Button((100, 550, 260, 100), unlocked_widget, "В меню", page_text_color)
-    go_to_next_level = Button((540, 550, 260, 100), unlocked_widget, " Далее", page_text_color)
+    gui_lvl.add_element(Label((150, 50, 620, 100), unlocked_widget, " Уровень пройден", base_text_color))
+    gui_lvl.add_element(Label((220, 150, 400, 400), -1, random.choice(phrases), special_color))
+    go_to_menu = Button((100, 550, 260, 100), unlocked_widget, "В меню", base_text_color)
+    go_to_next_level = Button((540, 550, 260, 100), unlocked_widget, " Далее", base_text_color)
 
     gui_lvl.add_element(go_to_menu)
     gui_lvl.add_element(go_to_next_level)

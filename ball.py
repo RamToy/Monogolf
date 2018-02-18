@@ -2,6 +2,7 @@ import pygame
 from math import hypot, sin, cos, atan, pi
 from Monogolf.sprites import rects, hole
 
+
 # Группа одного спрайта с мячиком
 ball = pygame.sprite.GroupSingle()
 
@@ -25,7 +26,7 @@ class Ball(pygame.sprite.Sprite):
         # Необходимо передавать объект рогатки и сверяться с его состоянием,
         # чтобы перемещать мячик вместе с ней во время натяжки
         self.slingshot = slingshot
-        self.radius = 15
+        self.radius = radius
         self.color = color
 
         super().__init__(ball)

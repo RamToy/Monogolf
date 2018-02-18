@@ -46,28 +46,40 @@ class Label:
 
 
 class Button(Label):
-    def __init__(self, rect, rect_color, text, font_color):
+    def __init__(self, rect, rect_color, text=None, font_color=None, image=None):
+        print(rect_color)
         super().__init__(rect, rect_color, text, font_color)
+        self.image = image
         self.pressed = False
 
     def render(self, surface):
         surface.fill(self.rect_color, self.rect)
-        self.rendered_text = self.font.render(self.text, 1, self.font_color)
+        if self.text:
+            self.rendered_text = self.font.render(self.text, 1, self.font_color)
         if not self.pressed:
             color1 = pygame.Color("white")
             color2 = pygame.Color("black")
-            self.rendered_rect = self.rendered_text.get_rect(x=self.rect.x + 5, centery=self.rect.centery)
+            if self.text:
+                self.rendered_rect = self.rendered_text.get_rect(x=self.rect.x + 5, centery=self.rect.centery)
+            elif self.image:
+                self.rendered_rect = self.image.get_rect(x=self.rect.x + 20, centery=self.rect.centery)
         else:
             color1 = pygame.Color("black")
             color2 = pygame.Color("white")
-            self.rendered_rect = self.rendered_text.get_rect(x=self.rect.x + 7, centery=self.rect.centery + 2)
+            if self.text:
+                self.rendered_rect = self.rendered_text.get_rect(x=self.rect.x + 7, centery=self.rect.centery + 2)
+            elif self.image:
+                self.rendered_rect = self.image.get_rect(x=self.rect.x + 25, centery=self.rect.centery + 2)
 
         pygame.draw.rect(surface, color1, self.rect, 2)
         pygame.draw.line(surface, color2, (self.rect.right - 1, self.rect.top),
                          (self.rect.right - 1, self.rect.bottom), 2)
         pygame.draw.line(surface, color2, (self.rect.left, self.rect.bottom - 1),
                          (self.rect.right, self.rect.bottom - 1), 2)
-        surface.blit(self.rendered_text, self.rendered_rect)
+        if self.text:
+            surface.blit(self.rendered_text, self.rendered_rect)
+        elif self.image:
+            surface.blit(self.image, self.rendered_rect)
 
     def get_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:

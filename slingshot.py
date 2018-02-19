@@ -1,11 +1,12 @@
 import pygame
-from Monogolf.settings import HEIGHT, INDENT, fg_color
+from Monogolf.settings import HEIGHT, INDENT
 
 
 class Slingshot:
     """ Класс рогатки """
 
-    def __init__(self, center_pos, center_range, shoulder_radius):
+    def __init__(self, center_pos, center_range, shoulder_radius, color):
+        self.color = color
         # Дефолтная позиция
         self.center_pos = center_pos
         # Текущая позиция (изначально равна дефолтной)
@@ -55,10 +56,10 @@ class Slingshot:
             # Здесь можно посмотреть зоны активности и захвата
             # pygame.draw.rect(surface, (255, 0, 0), self.active_rect, 2)
             # pygame.draw.rect(surface, (0, 255, 0), self.capture_rect, 2)
-            pygame.draw.line(surface, fg_color, self.left_shoulder, self.cur_pos, 4)
-            pygame.draw.line(surface, fg_color, self.right_shoulder, self.cur_pos, 4)
-            pygame.draw.circle(surface, fg_color, self.left_shoulder, self.shoulder_radius, 0)
-            pygame.draw.circle(surface, fg_color, self.right_shoulder, self.shoulder_radius, 0)
+            pygame.draw.line(surface, self.color, self.left_shoulder, self.cur_pos, 4)
+            pygame.draw.line(surface, self.color, self.right_shoulder, self.cur_pos, 4)
+            pygame.draw.circle(surface, self.color, self.left_shoulder, self.shoulder_radius, 0)
+            pygame.draw.circle(surface, self.color, self.right_shoulder, self.shoulder_radius, 0)
 
     def get_event(self, event):
         """ Метод, отвечающий за обработку событий """

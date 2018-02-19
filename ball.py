@@ -22,16 +22,17 @@ def side_collide(pos, rect):
 class Ball(pygame.sprite.Sprite):
     """ Класс мячика """
 
-    def __init__(self, slingshot, radius, color):
+    def __init__(self, slingshot, radius, color, image=None):
         # Необходимо передавать объект рогатки и сверяться с его состоянием,
         # чтобы перемещать мячик вместе с ней во время натяжки
         self.slingshot = slingshot
         self.radius = radius
         self.color = color
-
         super().__init__(ball)
         self.image = pygame.Surface((2 * radius, 2 * radius), pygame.SRCALPHA, 32)
         pygame.draw.circle(self.image, self.color, (radius, radius), radius, 0)
+        if image:
+            self.image.blit(image, (0, 0))
         self.rect = self.image.get_rect()
 
         # Изначально до движения мячика все параметры равны нулю

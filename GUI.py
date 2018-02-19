@@ -47,7 +47,6 @@ class Label:
 
 class Button(Label):
     def __init__(self, rect, rect_color, text=None, font_color=None, image=None):
-        print(rect_color)
         super().__init__(rect, rect_color, text, font_color)
         self.image = image
         self.pressed = False
@@ -69,7 +68,7 @@ class Button(Label):
             if self.text:
                 self.rendered_rect = self.rendered_text.get_rect(x=self.rect.x + 7, centery=self.rect.centery + 2)
             elif self.image:
-                self.rendered_rect = self.image.get_rect(x=self.rect.x + 25, centery=self.rect.centery + 2)
+                self.rendered_rect = self.image.get_rect(x=self.rect.x + 22, centery=self.rect.centery + 2)
 
         pygame.draw.rect(surface, color1, self.rect, 2)
         pygame.draw.line(surface, color2, (self.rect.right - 1, self.rect.top),
@@ -89,28 +88,40 @@ class Button(Label):
             
             
 class TextBox(Label):
-    def __init__(self, rect, rect_color, text, font_color):
+    def __init__(self, rect, rect_color, font_color, text=''):
         super().__init__(rect, rect_color, text, font_color)
+        self.password = ''
         self.active = True
         self.blink = True
         self.blink_timer = 0
+        self.done = False
 
     def get_event(self, event):
         if event.type == pygame.KEYDOWN and self.active:
+            if self.done:
+                self.password = ''
+                self.done = False
             if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-                self.execute()
+                self.done = True
+                self.text = ''
             elif event.key == pygame.K_BACKSPACE:
                 if len(self.text) > 0:
                     self.text = self.text[:-1]
-            else:
-                self.text += event.unicode
+                    self.password = self.password[:-1]
+            elif len(self.text) < 4:
+                self.text += '*'
+                self.password += event.unicode
+
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            self.active = self.rect.collidepoint(event.pos)
+            self.active = self.rect.collidepoint(*event.pos)
 
     def update(self):
         if pygame.time.get_ticks() - self.blink_timer > 200:
             self.blink = not self.blink
             self.blink_timer = pygame.time.get_ticks()
+        if not self.active:
+            self.text = ''
+            self.password = ''
 
     def render(self, surface):
         super(TextBox, self).render(surface)

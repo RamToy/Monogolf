@@ -26,6 +26,9 @@ class GUI:
             if callable(get_event):
                 element.get_event(event)
 
+    def clear(self):
+        self.elements.clear()
+
 
 class Label:
     def __init__(self, rect, rect_color, text, font_color):
@@ -92,15 +95,13 @@ class TextBox(Label):
         super().__init__(rect, rect_color, text, font_color)
         self.password = ''
         self.active = True
-        self.blink = True
-        self.blink_timer = 0
         self.done = False
 
     def get_event(self, event):
         if event.type == pygame.KEYDOWN and self.active:
             if self.done:
-                self.password = ''
                 self.done = False
+                self.password = ''
             if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
                 self.done = True
                 self.text = ''
@@ -114,18 +115,4 @@ class TextBox(Label):
 
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.active = self.rect.collidepoint(*event.pos)
-
-    def update(self):
-        if pygame.time.get_ticks() - self.blink_timer > 200:
-            self.blink = not self.blink
-            self.blink_timer = pygame.time.get_ticks()
-        if not self.active:
-            self.text = ''
-            self.password = ''
-
-    def render(self, surface):
-        super(TextBox, self).render(surface)
-        if self.blink and self.active:
-            pygame.draw.line(surface, self.rect_color,
-                             (self.rendered_rect.right + 2, self.rendered_rect.top + 2),
-                             (self.rendered_rect.right + 2, self.rendered_rect.bottom - 2))
+            self.text, self.password = '', ''

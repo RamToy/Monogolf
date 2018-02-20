@@ -36,7 +36,7 @@ class Ball(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
         # Изначально до движения мячика все параметры равны нулю
-        self.one_step = 15        # Длина единичного вектора
+        self.one_step = 10        # Длина единичного вектора
         self.speed = 0            # Скорость перемещения для tick()
         self.x_dir = 0            # Направление по оси X
         self.y_dir = 0            # Направление по оси Y

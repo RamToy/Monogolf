@@ -33,6 +33,7 @@ class Slingshot:
         self.active = True
         # Флаг, отвечающий за фокусировку (перемещение за курсором) рогатки
         self.focus = False
+        self.restart = 0
 
     def check_pos(self, pos):
         """ Метод, проверяющий выход рогатки при натягивании за пределы активной зоны (self.active_rect) """
@@ -63,7 +64,6 @@ class Slingshot:
 
     def get_event(self, event):
         """ Метод, отвечающий за обработку событий """
-
         # Если рогатка активна
         if self.active:
             # Если зажата ЛКМ в области захвата
@@ -94,6 +94,7 @@ class Slingshot:
 
         # Если рогатка неактивна и нажимается пробел
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                # Рогатка активируется в дефолтной позиции
-                self.active = True
-                self.cur_pos = self.center_pos
+            # Рогатка активируется в дефолтной позиции
+            self.restart = True
+            self.active = True
+            self.cur_pos = self.center_pos

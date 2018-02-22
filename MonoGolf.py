@@ -10,10 +10,6 @@ from Monogolf.slingshot import Slingshot
 from Monogolf.sprites import rects, hole
 from Monogolf.GUI import GUI, Label, Button, ImageButton, TextBox
 
-page_bgcolor = 43, 173, 100
-text_color = 255, 255, 255
-special_color = 166, 34, 146
-unlocked_widget = 250, 100, 0
 locked_widget = 140, 140, 140
 coin_color = 255, 219, 77
 
@@ -27,7 +23,8 @@ blocked_image.blit(font, (25, 8))
 
 def create_image_list():
     imgs = []
-    for bg, fg, b in colors:
+    for color_set in colors:
+        bg, fg, b, nbg, nfg = color_set
         img = pygame.Surface((110, 60))
         img.fill(bg)
         pygame.draw.circle(img, b, (55, 30), 15, 0)
@@ -47,9 +44,10 @@ class Game:
         self.images = create_image_list()
         self.all_levels = [[level_list[i], True if i == 0 else False] for i in range(len(level_list))]
         self.current_level = 0
-        self.current_image = 0
         self.current_design = 0
-        self.bg_color, self.fg_color, self.ball_color = colors[0]
+        self.current_image = None
+        self.bg_color, self.fg_color, self.ball_color, \
+            self.n_bg_color, self.n_fg_color = colors[0]
         self.coins = 10
         self.lives = 30
 
@@ -58,27 +56,31 @@ class Game:
             if self.coins >= 10:
                 self.coins -= 10
                 self.images[index][1] = True
+                self.current_design = index
+                self.bg_color, self.fg_color, self.ball_color, \
+                    self.n_bg_color, self.n_fg_color = colors[index]
                 return True
         elif self.current_design != index:
             self.current_design = index
-            self.bg_color, self.fg_color, self.ball_color = colors[index]
+            self.bg_color, self.fg_color, self.ball_color,\
+                self.n_bg_color, self.n_fg_color = colors[index]
             return True
         return False
 
     def check_lives(self):
         self.lives -= 1
         if self.lives <= 0:
-            self.game_over_page()
+            self.lose_page()
 
     def menu_page(self):
         gui_menu = GUI()
-        gui_menu.add_element(Label((270, 30, 150, 100), -1, "mono", (0, 0, 0)))
-        gui_menu.add_element(Label((450, 30, 100, 100), -1, "GOLF", text_color))
-        play_button = Button((310, 150, 280, 100), unlocked_widget, " Играть", text_color)
-        shop_button = Button((310, 320, 280, 100), unlocked_widget, "Магазин", text_color)
-        exit_button = Button((670, 620, 170, 60), unlocked_widget, " Выход", text_color)
-        developers_button = Button((30, 620, 220, 60), unlocked_widget, "SilverToy58", text_color)
-        tutorial_button = Button((280, 490, 350, 80), unlocked_widget, "Информация", text_color)
+        gui_menu.add_element(Label((270, 30, 150, 100), -1, "mono", self.fg_color))
+        gui_menu.add_element(Label((450, 30, 100, 100), -1, "GOLF", self.ball_color))
+        play_button = Button((310, 150, 280, 100), self.fg_color, " Играть", self.n_bg_color)
+        shop_button = Button((310, 320, 280, 100), self.fg_color, "Магазин", self.n_bg_color)
+        exit_button = Button((670, 620, 170, 60), self.fg_color, " Выход", self.n_bg_color)
+        developers_button = Button((30, 620, 220, 60), self.fg_color, "SilverToy58", self.n_bg_color)
+        tutorial_button = Button((280, 490, 350, 80), self.fg_color, "Информация", self.n_bg_color)
 
         gui_menu.add_element(play_button)
         gui_menu.add_element(shop_button)
@@ -86,7 +88,7 @@ class Game:
         gui_menu.add_element(tutorial_button)
         gui_menu.add_element(exit_button)
 
-        self.surface.fill(page_bgcolor)
+        self.surface.fill(self.bg_color)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -109,27 +111,27 @@ class Game:
 
     def levels_page(self):
         gui_levels = GUI()
-        lvl1 = Button((175, 30, 250, 72), unlocked_widget if self.all_levels[0][1] else locked_widget,
-                      " Level 1", text_color)
-        lvl2 = Button((475, 30, 250, 72), unlocked_widget if self.all_levels[1][1] else locked_widget,
-                      " Level 2", text_color)
-        lvl3 = Button((175, 150, 250, 72), unlocked_widget if self.all_levels[2][1] else locked_widget,
-                      " Level 3", text_color)
-        lvl4 = Button((475, 150, 250, 72), unlocked_widget if self.all_levels[3][1] else locked_widget,
-                      " Level 4", text_color)
-        lvl5 = Button((175, 270, 250, 72), unlocked_widget if self.all_levels[4][1] else locked_widget,
-                      " Level 5", text_color)
-        lvl6 = Button((475, 270, 250, 72), unlocked_widget if self.all_levels[5][1] else locked_widget,
-                      " Level 6", text_color)
-        lvl7 = Button((175, 390, 250, 72), unlocked_widget if self.all_levels[6][1] else locked_widget,
-                      " Level 7", text_color)
-        lvl8 = Button((475, 390, 250, 72), unlocked_widget if self.all_levels[7][1] else locked_widget,
-                      " Level 8", text_color)
-        lvl9 = Button((175, 510, 250, 72), unlocked_widget if self.all_levels[8][1] else locked_widget,
-                      " Level 9", text_color)
-        lvl10 = Button((475, 510, 250, 72), unlocked_widget if self.all_levels[9][1] else locked_widget,
-                       " Level 10", text_color)
-        back = Button((365, 620, 170, 60), unlocked_widget, "  назад", text_color)
+        lvl1 = Button((175, 30, 250, 72), self.fg_color if self.all_levels[0][1] else locked_widget,
+                      " Level 1", self.n_bg_color)
+        lvl2 = Button((475, 30, 250, 72), self.fg_color if self.all_levels[1][1] else locked_widget,
+                      " Level 2", self.n_bg_color)
+        lvl3 = Button((175, 150, 250, 72), self.fg_color if self.all_levels[2][1] else locked_widget,
+                      " Level 3", self.n_bg_color)
+        lvl4 = Button((475, 150, 250, 72), self.fg_color if self.all_levels[3][1] else locked_widget,
+                      " Level 4", self.n_bg_color)
+        lvl5 = Button((175, 270, 250, 72), self.fg_color if self.all_levels[4][1] else locked_widget,
+                      " Level 5", self.n_bg_color)
+        lvl6 = Button((475, 270, 250, 72), self.fg_color if self.all_levels[5][1] else locked_widget,
+                      " Level 6", self.n_bg_color)
+        lvl7 = Button((175, 390, 250, 72), self.fg_color if self.all_levels[6][1] else locked_widget,
+                      " Level 7", self.n_bg_color)
+        lvl8 = Button((475, 390, 250, 72), self.fg_color if self.all_levels[7][1] else locked_widget,
+                      " Level 8", self.n_bg_color)
+        lvl9 = Button((175, 510, 250, 72), self.fg_color if self.all_levels[8][1] else locked_widget,
+                      " Level 9", self.n_bg_color)
+        lvl10 = Button((475, 510, 250, 72), self.fg_color if self.all_levels[9][1] else locked_widget,
+                       " Level 10", self.n_bg_color)
+        back = Button((365, 620, 170, 60), self.fg_color, "  назад", self.n_bg_color)
 
         gui_levels.add_element(lvl1)
         gui_levels.add_element(lvl2)
@@ -143,11 +145,13 @@ class Game:
         gui_levels.add_element(lvl10)
         gui_levels.add_element(back)
 
-        self.surface.fill(page_bgcolor)
+        self.surface.fill(self.bg_color)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    back.pressed = True
                 gui_levels.get_event(event)
 
             gui_levels.render(self.surface)
@@ -188,10 +192,13 @@ class Game:
 
     def store_page(self):
         gui_shop = GUI()
-        gui_shop.add_element(Label((300, 20, 310, 100), special_color, " Магазин", text_color))
+        gui_shop.add_element(Label((300, 20, 310, 100), self.ball_color, " Магазин", self.fg_color))
         gui_shop.add_element(Label((640, 40, 100, 60), -1, " Золото : {}".format(self.coins), coin_color))
+        gui_shop.add_element(Label((640, 475, 20, 50), -1,
+                                   "1" if self.current_image == ilya else ("2" if self.current_image == artem else ""),
+                                   self.ball_color))
         gui_shop.add_element(Label((400, 625, 100, 60), -1,
-                                   " Текущая расцветка : {}".format(self.current_design + 1), special_color))
+                                   " Текущая расцветка : {}".format(self.current_design + 1), self.ball_color))
 
         design0 = ImageButton((75, 150, 150, 100), colors[0][1], self.images[0][0])
         design1 = ImageButton((275, 150, 150, 100),
@@ -222,13 +229,13 @@ class Game:
                               colors[9][1] if self.images[9][1] else locked_widget,
                               self.images[9][0] if self.images[9][1] else blocked_image)
 
-        image_button1 = ImageButton((515, 465, 70, 70), unlocked_widget if self.images[10][1] else locked_widget,
+        image_button1 = ImageButton((515, 465, 70, 70), self.fg_color if self.images[10][1] else locked_widget,
                                     self.images[10][0] if self.images[10][1] else None)
-        image_button2 = ImageButton((715, 465, 70, 70), unlocked_widget if self.images[11][1] else locked_widget,
+        image_button2 = ImageButton((715, 465, 70, 70), self.fg_color if self.images[11][1] else locked_widget,
                                     self.images[11][0] if self.images[11][1] else None)
-        text_box1 = TextBox((507, 550, 90, 60), [page_bgcolor[c] - 20 for c in range(3)], special_color)
-        text_box2 = TextBox((707, 550, 90, 60), [page_bgcolor[c] - 20 for c in range(3)], special_color)
-        back = Button((75, 610, 170, 60), unlocked_widget, "  назад", text_color)
+        text_box1 = TextBox((505, 550, 90, 60), [self.bg_color[c] + 20 for c in range(3)], self.ball_color)
+        text_box2 = TextBox((705, 550, 90, 60), [self.bg_color[c] + 20 for c in range(3)], self.ball_color)
+        back = Button((75, 610, 170, 60), self.fg_color, "  назад", self.n_bg_color)
 
         gui_shop.add_element(design0)
         gui_shop.add_element(design1)
@@ -246,11 +253,13 @@ class Game:
         gui_shop.add_element(text_box2)
         gui_shop.add_element(back)
 
-        self.surface.fill(page_bgcolor)
+        self.surface.fill(self.bg_color)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    back.pressed = True
                 gui_shop.get_event(event)
 
             gui_shop.render(self.surface)
@@ -289,27 +298,33 @@ class Game:
                 if self.buy_or_select_design(9):
                     self.store_page()
             elif image_button1.pressed and self.images[10][1]:
-                self.current_image = 0 if self.current_image == 1 else 1
+                self.current_image = None if self.current_image == ilya else ilya
+                self.store_page()
             elif image_button2.pressed and self.images[11][1]:
-                self.current_image = 0 if self.current_image == 2 else 2
+                self.current_image = None if self.current_image == artem else artem
+                self.store_page()
             elif text_box1.password == '1337' and text_box1.done and not self.images[10][1]:
                 self.images[10][1] = True
+                self.current_image = ilya
                 self.store_page()
             elif text_box2.password == '1247' and text_box2.done and not self.images[11][1]:
                 self.images[11][1] = True
+                self.current_image = artem
                 self.store_page()
 
     def guide_page(self):
         gui_guide = GUI()
-        back = Button((365, 620, 170, 60), unlocked_widget, "  назад", text_color)
+        back = Button((365, 620, 170, 60), self.fg_color, "  назад", self.n_bg_color)
         gui_guide.add_element(back)
 
-        self.surface.fill(page_bgcolor)
+        self.surface.fill(self.bg_color)
         self.surface.blit(load_image('guide.png'), (0, 0))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    back.pressed = True
                 gui_guide.get_event(event)
 
             gui_guide.render(self.surface)
@@ -321,18 +336,20 @@ class Game:
     def developers_page(self):
         gui_dev = GUI()
         gui_dev.add_element(Label((70, 70, 200, 60), -1,
-                                  "Эта ссылка временно не работает...", special_color))
+                                  "Эта ссылка временно не работает...", self.ball_color))
         gui_dev.add_element(Label((70, 480, 200, 50), -1,
-                                  'Нажмите "назад", чтобы выйти в главное меню.', special_color))
-        back = Button((75, 610, 170, 60), unlocked_widget, "  назад", text_color)
+                                  'Нажмите "назад", чтобы выйти в главное меню.', self.ball_color))
+        back = Button((75, 610, 170, 60), self.fg_color, "  назад", self.n_bg_color)
 
         gui_dev.add_element(back)
 
-        self.surface.fill(page_bgcolor)
+        self.surface.fill(self.bg_color)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     terminate()
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    back.pressed = True
                 gui_dev.get_event(event)
 
             gui_dev.render(self.surface)
@@ -345,18 +362,16 @@ class Game:
         gui_game = GUI()
         gui_game.add_element(Label((40, 620, 70, 50), -1, 'жизни : {}'.format(self.lives), self.fg_color))
         gui_game.add_element(Label((40, 570, 70, 50), -1, 'уровень {}'.format(self.current_level + 1), self.ball_color))
-        pause = Button((835, 635, 40, 40), unlocked_widget, " II", text_color)
+        pause = Button((835, 635, 40, 40), self.n_fg_color, " II", self.n_bg_color)
 
         gui_game.add_element(pause)
 
         clock = pygame.time.Clock()
         slingshot = Slingshot((WIDTH // 2, HEIGHT // 4 * 3), 100, 10, self.fg_color)
-        if self.current_image == 0:
+        if self.current_image is None:
             Ball(slingshot, 15, self.ball_color)
-        elif self.current_image == 1:
-            Ball(slingshot, 15, self.ball_color, ilya)
-        elif self.current_image == 2:
-            Ball(slingshot, 15, self.ball_color, artem)
+        else:
+            Ball(slingshot, 15, self.ball_color, self.current_image)
 
         level(self.fg_color, self.ball_color)
 
@@ -407,16 +422,17 @@ class Game:
         hole.empty()
 
         gui_lvl = GUI()
-        gui_lvl.add_element(Label((150, 50, 620, 100), unlocked_widget, " Уровень пройден", text_color))
-        gui_lvl.add_element(Label((300, 170, 350, 300), -1, random.choice(['GG!', 'GJ!', 'WP!']), special_color))
-        gui_lvl.add_element(Label((110, 430, 300, 90), -1, "Золото + 10   Всего : {}".format(self.coins), coin_color))
-        go_to_menu = Button((100, 550, 260, 100), unlocked_widget, "В меню", text_color)
-        go_to_next_level = Button((540, 550, 260, 100), unlocked_widget, " Далее", text_color)
+        gui_lvl.add_element(Label((150, 50, 620, 100), self.fg_color, " Уровень пройден", self.n_bg_color))
+        gui_lvl.add_element(Label((300, 170, 350, 300), -1, random.choice(['GG!', 'GJ!', 'WP!']), self.ball_color))
+        gui_lvl.add_element(Label((110, 430, 300, 90), -1, "Золото + 10   Всего : {}".format(self.coins),
+                                  self.ball_color if self.current_design == 9 else coin_color))
+        go_to_menu = Button((100, 550, 260, 100), self.fg_color, "В меню", self.n_bg_color)
+        go_to_next_level = Button((540, 550, 260, 100), self.fg_color, " Далее", self.n_bg_color)
 
         gui_lvl.add_element(go_to_menu)
         gui_lvl.add_element(go_to_next_level)
 
-        self.surface.fill(page_bgcolor)
+        self.surface.fill(self.bg_color)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -433,17 +449,17 @@ class Game:
 
     def pause_page(self):
         gui_pause = GUI()
-        gui_pause.add_element(Label((380, 210, 140, 70), special_color, "Пауза", text_color))
-        gui_pause.add_element(Label((300, 280, 150, 70), -1, "Начать заново", text_color))
-        gui_pause.add_element(Label((370, 340, 150, 70), -1, "[Space]", text_color))
-        go_to_menu = Button((500, 430, 130, 50), unlocked_widget, "В меню", text_color)
-        back = Button((270, 430, 170, 50), unlocked_widget, "Вернуться", text_color)
+        gui_pause.add_element(Label((375, 210, 160, 70), self.n_fg_color, " Пауза", self.n_bg_color))
+        gui_pause.add_element(Label((300, 280, 150, 70), -1, "Начать заново", self.n_bg_color))
+        gui_pause.add_element(Label((370, 340, 150, 70), -1, "[Space]", self.n_bg_color))
+        go_to_menu = Button((500, 430, 130, 50), self.fg_color, "В меню", self.n_bg_color)
+        back = Button((270, 430, 170, 50), self.fg_color, "Вернуться", self.n_bg_color)
 
         gui_pause.add_element(go_to_menu)
         gui_pause.add_element(back)
 
-        self.surface.fill(special_color, (240, 190, 420, 320))
-        self.surface.fill(page_bgcolor, (250, 200, 400, 300))
+        self.surface.fill(self.n_fg_color, (240, 190, 420, 320))
+        self.surface.fill([self.bg_color[c] - 10 for c in range(3)], (250, 200, 400, 300))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -461,13 +477,13 @@ class Game:
             elif back.pressed:
                 break
 
-    def game_over_page(self):
+    def lose_page(self):
         gui_over = GUI()
-        gui_over.add_element(Label((200, 30, 540, 100), special_color, " Вы проиграли!", text_color))
-        gui_over.add_element(Label((50, 170, 540, 60), -1, "К сожалению, у Вас закончились жизни", text_color))
-        gui_over.add_element(Label((50, 310, 540, 60), -1, "Можете начать новую игру, перейдя в меню", text_color))
-        gui_over.add_element(Label((50, 430, 540, 60), -1, "[ Прогресс покупок сохраняется ]", special_color))
-        go_to_menu = Button((100, 550, 260, 100), unlocked_widget, "В меню", text_color)
+        gui_over.add_element(Label((200, 30, 540, 100), self.ball_color, " Вы проиграли!", self.n_bg_color))
+        gui_over.add_element(Label((150, 180, 540, 50), -1, "К сожалению, у Вас закончились жизни", self.n_bg_color))
+        gui_over.add_element(Label((120, 230, 540, 50), -1, "Можете начать новую игру, перейдя в меню", self.n_bg_color))
+        gui_over.add_element(Label((140, 360, 540, 60), -1, "[ Прогресс покупок сохраняется ]", self.ball_color))
+        go_to_menu = Button((100, 550, 260, 100), self.fg_color, "В меню", self.n_bg_color)
 
         gui_over.add_element(go_to_menu)
 
@@ -477,7 +493,7 @@ class Game:
         rects.empty()
         hole.empty()
 
-        self.surface.fill(page_bgcolor)
+        self.surface.fill(self.bg_color)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -492,11 +508,11 @@ class Game:
 
     def won_page(self):
         gui_won = GUI()
-        gui_won.add_element(Label((200, 30, 540, 100), special_color, " Вы победили!", text_color))
-        gui_won.add_element(Label((50, 190, 540, 60), -1, "Поздравляем, Вы лучше всех!", text_color))
-        gui_won.add_element(Label((50, 310, 540, 60), -1, "Можете продолжить игру, перейдя в меню", text_color))
-        gui_won.add_element(Label((50, 430, 540, 60), -1, "[ Прогресс покупок сохраняется ]", special_color))
-        go_to_menu = Button((100, 550, 260, 100), unlocked_widget, "В меню", text_color)
+        gui_won.add_element(Label((200, 30, 540, 100), self.ball_color, " Вы победили!", self.n_bg_color))
+        gui_won.add_element(Label((230, 180, 540, 50), -1, "Поздравляем, Вы лучше всех!", self.n_bg_color))
+        gui_won.add_element(Label((130, 230, 540, 50), -1, "Можете продолжить игру, перейдя в меню", self.n_bg_color))
+        gui_won.add_element(Label((140, 360, 540, 60), -1, "[ Прогресс покупок сохраняется ]", self.ball_color))
+        go_to_menu = Button((100, 550, 260, 100), self.fg_color, "В меню", self.n_bg_color)
 
         gui_won.add_element(go_to_menu)
 
@@ -504,7 +520,7 @@ class Game:
         rects.empty()
         hole.empty()
 
-        self.surface.fill(page_bgcolor)
+        self.surface.fill(self.bg_color)
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

@@ -85,13 +85,9 @@ class ImageButton:
         self.rect_color = rect_color
         self.image = image
         self.pressed = False
-        self.active = False
         self.rendered_rect = None
 
     def render(self, surface):
-        if self.active:
-            surface.fill(pygame.Color("red"), (self.rect.x - 5, self.rect.y - 5,
-                                               self.rect.w + 10, self.rect.h + 10))
         surface.fill(self.rect_color, self.rect)
         if not self.pressed:
             color1 = pygame.Color("white")
@@ -123,7 +119,7 @@ class TextBox(Label):
     def __init__(self, rect, rect_color, font_color, text=''):
         super().__init__(rect, rect_color, text, font_color)
         self.password = ''
-        self.active = True
+        self.active = False
         self.done = False
 
     def get_event(self, event):

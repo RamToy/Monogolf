@@ -43,7 +43,7 @@ class Label:
     def render(self, surface):
         if self.rect_color != -1:
             surface.fill(self.rect_color, self.rect)
-        self.rendered_text = self.font.render(self.text, 0, self.font_color)
+        self.rendered_text = self.font.render(self.text, 10, self.font_color)
         self.rendered_rect = self.rendered_text.get_rect(x=self.rect.x + 2, centery=self.rect.centery, width=2)
         surface.blit(self.rendered_text, self.rendered_rect)
 

@@ -1,5 +1,5 @@
 import pygame
-from Monogolf.settings import HEIGHT, INDENT
+from settings import HEIGHT, INDENT
 
 
 class Slingshot:

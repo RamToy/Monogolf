@@ -2,13 +2,13 @@ import os
 import sys
 import random
 import pygame
-from Monogolf.levels import *
-from Monogolf.settings import *
-from Monogolf.design import colors
-from Monogolf.ball import ball, Ball
-from Monogolf.slingshot import Slingshot
-from Monogolf.sprites import rects, hole
-from Monogolf.GUI import GUI, Label, Button, ImageButton, TextBox
+from levels import *
+from settings import *
+from design import colors
+from ball import ball, Ball
+from slingshot import Slingshot
+from sprites import rects, hole
+from GUI import GUI, Label, Button, ImageButton, TextBox
 
 locked_widget = 140, 140, 140
 coin_color = 255, 219, 77
@@ -52,7 +52,7 @@ class Game:
         # Картинки раскрасок
         self.images = create_image_list()
         # Уровни представляют собой пары значений (аналогично create_image_list)
-        self.all_levels = [[level_list[i], True if i == 9 else False] for i in range(len(level_list))]
+        self.all_levels = [[level_list[i], True if i == 0 else False] for i in range(len(level_list))]
         # Текущий уровень
         self.current_level = 0
         # Текущая раскраска
@@ -65,7 +65,7 @@ class Game:
         # Золото
         self.coins = 10
         # Жизни
-        self.lives = 1
+        self.lives = 30
 
     def buy_or_select_design(self, index):
         """ Обработка взаимодействий с конпками магазина """

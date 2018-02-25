@@ -1,6 +1,6 @@
 import pygame
 from math import hypot, sin, cos, atan, pi
-from Monogolf.sprites import rects, hole
+from sprites import rects, hole
 
 
 # Группа одного спрайта с мячиком

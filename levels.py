@@ -1,5 +1,5 @@
-from Monogolf.settings import WIDTH, HEIGHT, INDENT
-from Monogolf.sprites import BoarderRect, Hole
+from settings import WIDTH, HEIGHT, INDENT
+from sprites import BoarderRect, Hole
 
 
 def add_frames(fg):
